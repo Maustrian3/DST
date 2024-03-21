@@ -14,14 +14,12 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public IDriverDAO createDriverDAO() {
-        // TODO
-        return null;
+        return new DriverDAO(em);
     }
 
     @Override
     public IEmploymentDAO createEmploymentDAO() {
-        // TODO
-        return null;
+        return new EmploymentDAO(em);
     }
 
     @Override
@@ -32,14 +30,12 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public IMatchDAO createMatchDAO() {
-        // TODO
-        return null;
+        return new MatchDAO(em);
     }
 
     @Override
     public IOrganizationDAO createOrganizationDAO() {
-        // TODO
-        return null;
+        return new OrganizationDAO(em);
     }
 
     @Override
@@ -62,8 +58,7 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public IVehicleDAO createVehicleDAO() {
-        // TODO
-        return null;
+        return new VehicleDAO(em);
     }
 
     @Override

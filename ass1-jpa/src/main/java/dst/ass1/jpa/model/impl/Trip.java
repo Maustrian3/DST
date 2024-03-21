@@ -23,14 +23,12 @@ public class Trip implements ITrip {
 
     private TripState state;
 
-    @OneToOne(mappedBy = "tripinfo")
+    @OneToOne(mappedBy = "trip", optional = true)
     @PrimaryKeyJoinColumn
-    @NotFound(action = NotFoundAction.IGNORE)
     private TripInfo tripInfo;
 
-    @OneToOne(mappedBy = "match")
-    @PrimaryKeyJoinColumn
-    @NotFound(action = NotFoundAction.IGNORE)
+
+    @OneToOne(mappedBy = "trip", optional = true)
     private Match match;
     @ManyToOne
     @JoinColumn(name = I_RIDER, nullable = true)

@@ -7,8 +7,7 @@ import dst.ass1.jpa.model.ITripReceipt;
 import javax.persistence.*;
 import java.util.Date;
 
-import static dst.ass1.jpa.util.Constants.I_TRIP;
-import static dst.ass1.jpa.util.Constants.I_TRIP_RECEIPT;
+import static dst.ass1.jpa.util.Constants.*;
 
 @Entity
 public class TripInfo implements ITripInfo {
@@ -23,13 +22,13 @@ public class TripInfo implements ITripInfo {
 
     private Integer riderRating;
 
-    @OneToOne(mappedBy = "tripreceipt", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "tripInfo", optional = false, cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private TripReceipt tripReceipt;
 
-    @ManyToOne(cascade =  CascadeType.ALL )
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @MapsId
     @JoinColumn(name = I_TRIP)
-    //@NotFound(action=NotFoundAction.IGNORE) // TODO Check is this necessary here?
     private Trip trip;
 
     @Override

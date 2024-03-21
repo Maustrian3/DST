@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static dst.ass1.jpa.util.Constants.I_DRIVER;
 import static dst.ass1.jpa.util.Constants.I_VEHICLE;
 
 @Entity
@@ -30,7 +31,7 @@ public class Driver extends PlatformUser implements IDriver {
     @JoinColumn(name = I_VEHICLE, nullable = false)
     private Vehicle vehicle;
 
-    @OneToMany(mappedBy = "organization")
+    @OneToMany(mappedBy = "id.driver") // Mapped by the related entity (Employment) through part of its composite key (id.driver)
     private Collection<Employment> employments = new ArrayList<>();
 
 //    @ManyToMany(mappedBy = "trip") // TODO Check is this no needed here? No methods for it in interface

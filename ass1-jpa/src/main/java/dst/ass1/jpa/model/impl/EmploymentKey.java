@@ -9,9 +9,6 @@ import java.io.Serializable;
 
 @Embeddable
 public class EmploymentKey implements IEmploymentKey, Serializable {
-    @Id
-    private Long employmentId;
-
     // TODO check how this works, not according to tutorial?!
     @ManyToOne
     @JoinColumn(name = "driver_id")
@@ -20,14 +17,6 @@ public class EmploymentKey implements IEmploymentKey, Serializable {
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
 
     @Override
     public Driver getDriver() {

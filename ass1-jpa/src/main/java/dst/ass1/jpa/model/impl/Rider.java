@@ -24,14 +24,12 @@ public class Rider extends PlatformUser implements IRider {
 
     private byte[] password;
 
-//    private Trip trip;
-
     @OneToMany
     @JoinColumn(name = I_PAYMENT_INFO, nullable = false)
-    private Collection<PaymentInfo> paymentInfo;
+    private Collection<PaymentInfo> paymentInfos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "trip")
-    private Collection<Trip> trips;
+    @OneToMany(mappedBy = "rider")
+    private Collection<Trip> trips = new ArrayList<>();
 
     @Override
     public Long getId() {
@@ -83,14 +81,14 @@ public class Rider extends PlatformUser implements IRider {
 
     @Override
     public Collection<IPaymentInfo> getPaymentInfos() {
-        return new ArrayList<>(this.paymentInfo);
+        return new ArrayList<>(this.paymentInfos);
     }
 
     @Override
     public void setPaymentInfos(Collection<IPaymentInfo> paymentInfos) {
-        this.paymentInfo.clear();
+        this.paymentInfos.clear();
         for(IPaymentInfo paymentInfo : paymentInfos) {
-            this.paymentInfo.add((PaymentInfo) paymentInfo);
+            this.paymentInfos.add((PaymentInfo) paymentInfo);
         }
     }
 }

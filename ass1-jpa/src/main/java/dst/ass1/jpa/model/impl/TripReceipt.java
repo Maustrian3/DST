@@ -24,7 +24,7 @@ public class TripReceipt implements ITripReceipt {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = I_TRIP_RECEIPT, nullable = false)
+    @JoinColumn(name = I_TRIP_INFO, nullable = false)
     private TripInfo tripInfo;
 
     @ManyToOne

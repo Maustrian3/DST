@@ -29,9 +29,8 @@ public class Match implements IMatch {
     @JoinColumn(name = I_DRIVER, nullable = false)
     private Driver driver;
 
-    @ManyToOne(cascade =  CascadeType.ALL )
-    @JoinColumn(name = I_TRIP)
-    //@NotFound(action=NotFoundAction.IGNORE) // TODO Check is this necessary here?
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = I_MATCH, unique = true)
     private Trip trip;
 
     @Override

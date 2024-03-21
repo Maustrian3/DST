@@ -19,11 +19,11 @@ public class Organization implements IOrganization {
 
     @ManyToMany
     @JoinTable(name = J_ORGANIZATION_VEHICLE,
-            joinColumns = @JoinColumn(name = "organization_id"),
-            inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
+            joinColumns = @JoinColumn(name = I_ORGANIZATION),
+            inverseJoinColumns = @JoinColumn(name = I_VEHICLE))
     private Collection<Vehicle> vehicles;
 
-    @OneToMany(mappedBy = "driver")
+    @OneToMany(mappedBy = "id.organization") // Mapped by the related entity (Employment) through part of its composite key (id.organization)
     private Collection<Employment> employments;
 
     @ManyToMany(fetch = FetchType.LAZY) // TODO check why lazy load here
