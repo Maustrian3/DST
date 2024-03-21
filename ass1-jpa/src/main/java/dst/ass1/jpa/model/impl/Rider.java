@@ -1,21 +1,47 @@
 package dst.ass1.jpa.model.impl;
 
+import dst.ass1.jpa.model.IPaymentInfo;
 import dst.ass1.jpa.model.IRider;
+import dst.ass1.jpa.model.ITrip;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static dst.ass1.jpa.util.Constants.I_PAYMENT_INFO;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","email"}))
 public class Rider extends PlatformUser implements IRider {
 
+    @Id
+    private Long id;
+
     @NotNull
     private String email;
 
     private byte[] password;
+
+//    private Trip trip;
+
+    @OneToMany
+    @JoinColumn(name = I_PAYMENT_INFO, nullable = false)
+    private Collection<PaymentInfo> paymentInfo;
+
+    @OneToMany(mappedBy = "trip")
+    private Collection<Trip> trips;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public String getEmail() {
@@ -35,5 +61,36 @@ public class Rider extends PlatformUser implements IRider {
     @Override
     public void setPassword(byte[] password) {
         this.password = password;
+    }
+
+    @Override
+    public Collection<ITrip> getTrips() {
+        return new ArrayList<>(this.trips);
+    }
+
+    @Override
+    public void setTrips(Collection<ITrip> trips) {
+        this.trips.clear();
+        for(ITrip trip : trips) {
+            this.trips.add((Trip) trip);
+        }
+    }
+
+    @Override
+    public void addTrip(ITrip trip) {
+        this.trips.add((Trip) trip);
+    }
+
+    @Override
+    public Collection<IPaymentInfo> getPaymentInfos() {
+        return new ArrayList<>(this.paymentInfo);
+    }
+
+    @Override
+    public void setPaymentInfos(Collection<IPaymentInfo> paymentInfos) {
+        this.paymentInfo.clear();
+        for(IPaymentInfo paymentInfo : paymentInfos) {
+            this.paymentInfo.add((PaymentInfo) paymentInfo);
+        }
     }
 }

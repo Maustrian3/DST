@@ -6,7 +6,10 @@ import dst.ass1.jpa.model.IVehicle;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static dst.ass1.jpa.util.Constants.I_VEHICLE;
 
@@ -28,17 +31,10 @@ public class Driver extends PlatformUser implements IDriver {
     private Vehicle vehicle;
 
     @OneToMany(mappedBy = "organization")
-    private Collection<Employment> employments;
+    private Collection<Employment> employments = new ArrayList<>();
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    @ManyToMany(mappedBy = "trip") // TODO Check is this no needed here? No methods for it in interface
+//    private Collection<Trip> trips;
 
     @Override
     public String getName() {
@@ -68,5 +64,33 @@ public class Driver extends PlatformUser implements IDriver {
     @Override
     public void setAvgRating(Double avgRating) {
         this.avgRating = avgRating;
+    }
+
+    @Override
+    public Collection<IEmployment> getEmployments() {
+        return new ArrayList<>(employments);
+    }
+
+    @Override
+    public void setEmployments(Collection<IEmployment> employments) {
+        this.employments.clear();
+        for (IEmployment employment : employments) {
+            this.employments.add((Employment) employment);
+        }
+    }
+
+    @Override
+    public void addEmployment(IEmployment employment) {
+        this.employments.add((Employment) employment);
+    }
+
+    @Override
+    public IVehicle getVehicle() {
+        return vehicle;
+    }
+
+    @Override
+    public void setVehicle(IVehicle vehicle) {
+        this.vehicle = (Vehicle) vehicle;
     }
 }

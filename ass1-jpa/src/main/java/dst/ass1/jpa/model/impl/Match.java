@@ -1,14 +1,15 @@
 package dst.ass1.jpa.model.impl;
 
-import dst.ass1.jpa.model.IMatch;
-import dst.ass1.jpa.model.IMoney;
+import dst.ass1.jpa.model.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
 
-import static dst.ass1.jpa.util.Constants.I_DRIVER;
-import static dst.ass1.jpa.util.Constants.I_VEHICLE;
+import static dst.ass1.jpa.util.Constants.*;
 
 @Entity
 public class Match implements IMatch {
@@ -27,6 +28,11 @@ public class Match implements IMatch {
     @ManyToOne
     @JoinColumn(name = I_DRIVER, nullable = false)
     private Driver driver;
+
+    @ManyToOne(cascade =  CascadeType.ALL )
+    @JoinColumn(name = I_TRIP)
+    //@NotFound(action=NotFoundAction.IGNORE) // TODO Check is this necessary here?
+    private Trip trip;
 
     @Override
     public Long getId() {
@@ -55,5 +61,35 @@ public class Match implements IMatch {
 
     public void setFare(IMoney fare) {
         this.fare = fare;
+    }
+
+    @Override
+    public ITrip getTrip() {
+        return trip;
+    }
+
+    @Override
+    public void setTrip(ITrip trip) {
+        this.trip = (Trip) trip;
+    }
+
+    @Override
+    public IVehicle getVehicle() {
+        return vehicle;
+    }
+
+    @Override
+    public void setVehicle(IVehicle vehicle) {
+        this.vehicle = (Vehicle) vehicle;
+    }
+
+    @Override
+    public IDriver getDriver() {
+        return driver;
+    }
+
+    @Override
+    public void setDriver(IDriver driver) {
+        this.driver = (Driver) driver;
     }
 }

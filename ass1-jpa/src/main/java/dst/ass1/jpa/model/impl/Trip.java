@@ -1,12 +1,18 @@
 package dst.ass1.jpa.model.impl;
 
-import dst.ass1.jpa.model.ITrip;
-import dst.ass1.jpa.model.TripState;
+import dst.ass1.jpa.model.*;
 import dst.ass1.jpa.model.impl.Location;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
+import static dst.ass1.jpa.util.Constants.*;
+
+@Entity
 public class Trip implements ITrip {
     @Id
     private Long id;
@@ -17,8 +23,34 @@ public class Trip implements ITrip {
 
     private TripState state;
 
+    @OneToOne(mappedBy = "tripinfo")
+    @PrimaryKeyJoinColumn
+    @NotFound(action = NotFoundAction.IGNORE)
+    private TripInfo tripInfo;
+
+    @OneToOne(mappedBy = "match")
+    @PrimaryKeyJoinColumn
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Match match;
+    @ManyToOne
+    @JoinColumn(name = I_RIDER, nullable = true)
+    private Rider rider;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = I_LOCATION, nullable = true)
     private Location pickup;
 
+    @ManyToMany
+    @JoinTable(
+            name = J_TRIP_LOCATION,
+            joinColumns = @JoinColumn(name = I_TRIP),
+            inverseJoinColumns = @JoinColumn(name = I_LOCATION))
+    private Collection<Location> stops;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = I_LOCATION, nullable = true)
     private Location destination;
 
     @Override
@@ -41,12 +73,14 @@ public class Trip implements ITrip {
         this.created = created;
     }
 
-    public Date getUpdate() {
+    @Override
+    public Date getUpdated() {
         return update;
     }
 
-    public void setUpdate(Date update) {
-        this.update = update;
+    @Override
+    public void setUpdated(Date updated) {
+        this.update = updated;
     }
 
     @Override
@@ -60,20 +94,70 @@ public class Trip implements ITrip {
     }
 
     @Override
-    public Location getPickup() {
+    public ILocation getPickup() {
         return pickup;
     }
 
-    public void setPickup(Location pickup) {
-        this.pickup = pickup;
+    @Override
+    public void setPickup(ILocation pickup) {
+        this.pickup = (Location) pickup;
     }
 
     @Override
-    public Location getDestination() {
+    public ILocation getDestination() {
         return destination;
     }
 
-    public void setDestination(Location destination) {
-        this.destination = destination;
+    @Override
+    public void setDestination(ILocation destination) {
+        this.destination = (Location) destination;
+    }
+
+    @Override
+    public Collection<ILocation> getStops() {
+        return new ArrayList<>(stops);
+    }
+
+    @Override
+    public void setStops(Collection<ILocation> stops) {
+        this.stops.clear();
+        for (ILocation stop : stops) {
+            this.stops.add((Location) stop);
+        }
+    }
+
+    @Override
+    public void addStop(ILocation stop) {
+        this.stops.add((Location) stop);
+    }
+
+    @Override
+    public ITripInfo getTripInfo() {
+        return tripInfo;
+    }
+
+    @Override
+    public void setTripInfo(ITripInfo tripInfo) {
+        this.tripInfo = (TripInfo) tripInfo;
+    }
+
+    @Override
+    public IMatch getMatch() {
+        return match;
+    }
+
+    @Override
+    public void setMatch(IMatch match) {
+        this.match = (Match) match;
+    }
+
+    @Override
+    public IRider getRider() {
+        return rider;
+    }
+
+    @Override
+    public void setRider(IRider rider) {
+        this.rider = (Rider) rider;
     }
 }
