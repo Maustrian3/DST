@@ -3,6 +3,7 @@ package dst.ass1.jpa.model.impl;
 import dst.ass1.jpa.model.IPaymentInfo;
 import dst.ass1.jpa.model.IRider;
 import dst.ass1.jpa.model.ITrip;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -24,6 +25,8 @@ public class Rider extends PlatformUser implements IRider {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
+
+    @Column(length = 20)
     private byte[] password;
 
     @OneToMany

@@ -17,9 +17,9 @@
 
             <many-to-one name="rider" target-entity="dst.ass1.jpa.model.impl.Rider"/>
 
-            <many-to-one name="pickup"/>
+            <many-to-one name="pickup" optional="false"/>
 
-            <many-to-one name="destination"/>
+            <many-to-one name="destination" optional="false"/>
 
             <one-to-one name="tripInfo" target-entity="dst.ass1.jpa.model.impl.TripInfo"
             mapped-by="trip" orphan-removal="true"/>

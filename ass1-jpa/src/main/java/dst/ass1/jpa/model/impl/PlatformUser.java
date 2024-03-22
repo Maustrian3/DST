@@ -15,6 +15,7 @@ public abstract class PlatformUser implements IPlatformUser {
     private String name;
 
     @NotNull
+    @Column(nullable = false)
     private String tel;
 
     private Double avgRating;
