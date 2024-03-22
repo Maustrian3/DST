@@ -12,6 +12,7 @@ import static dst.ass1.jpa.util.Constants.*;
 @Entity
 public class TripReceipt implements ITripReceipt {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -22,13 +23,12 @@ public class TripReceipt implements ITripReceipt {
 
     private Boolean paid;
 
-    @OneToOne
+    @OneToOne(optional = false)
     @MapsId
-    @JoinColumn(name = I_TRIP_INFO, nullable = false)
+    @JoinColumn(name = I_TRIP_RECEIPT)
     private TripInfo tripInfo;
 
-    @ManyToOne
-    @JoinColumn(name = I_PAYMENT_INFO, nullable = false)
+    @ManyToOne(optional = false)
     private PaymentInfo paymentInfo;
 
     @Override

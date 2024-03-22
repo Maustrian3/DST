@@ -4,11 +4,14 @@ import dst.ass1.jpa.model.IPaymentInfo;
 import dst.ass1.jpa.model.PaymentMethod;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class PaymentInfo implements IPaymentInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;

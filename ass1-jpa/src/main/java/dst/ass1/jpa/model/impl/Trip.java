@@ -15,40 +15,21 @@ import static dst.ass1.jpa.util.Constants.*;
 @Entity
 public class Trip implements ITrip {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date created;
-
     private Date update;
 
     private TripState state;
 
-    @OneToOne(mappedBy = "trip", optional = true)
-    @PrimaryKeyJoinColumn
     private TripInfo tripInfo;
 
-
-    @OneToOne(mappedBy = "trip", optional = true)
     private Match match;
-    @ManyToOne
-    @JoinColumn(name = I_RIDER, nullable = true)
     private Rider rider;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = I_LOCATION, nullable = true)
     private Location pickup;
-
-    @ManyToMany
-    @JoinTable(
-            name = J_TRIP_LOCATION,
-            joinColumns = @JoinColumn(name = I_TRIP),
-            inverseJoinColumns = @JoinColumn(name = I_LOCATION))
-    private Collection<Location> stops;
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = I_LOCATION, nullable = true)
+    private Collection<Location> stops = new ArrayList<>();
     private Location destination;
 
     @Override

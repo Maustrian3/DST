@@ -9,13 +9,10 @@ import java.io.Serializable;
 
 @Embeddable
 public class EmploymentKey implements IEmploymentKey, Serializable {
-    // TODO check how this works, not according to tutorial?!
     @ManyToOne
-    @JoinColumn(name = "driver_id")
     private Driver driver;
 
     @ManyToOne
-    @JoinColumn(name = "organization_id")
     private Organization organization;
 
     @Override

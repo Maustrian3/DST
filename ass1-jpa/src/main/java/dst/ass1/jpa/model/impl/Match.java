@@ -14,6 +14,7 @@ import static dst.ass1.jpa.util.Constants.*;
 @Entity
 public class Match implements IMatch {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date date;
@@ -21,16 +22,13 @@ public class Match implements IMatch {
     @Embedded
     private IMoney fare;
 
-    @ManyToOne
-    @JoinColumn(name = I_VEHICLE, nullable = false)
+    @ManyToOne(optional = false)
     private Vehicle vehicle;
 
-    @ManyToOne
-    @JoinColumn(name = I_DRIVER, nullable = false)
+    @ManyToOne(optional = false)
     private Driver driver;
 
     @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = I_MATCH, unique = true)
     private Trip trip;
 
     @Override

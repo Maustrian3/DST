@@ -13,29 +13,27 @@ import static dst.ass1.jpa.util.Constants.*;
 @Entity
 public class Organization implements IOrganization {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
     @ManyToMany
-    @JoinTable(name = J_ORGANIZATION_VEHICLE,
-            joinColumns = @JoinColumn(name = I_ORGANIZATION),
-            inverseJoinColumns = @JoinColumn(name = I_VEHICLE))
-    private Collection<Vehicle> vehicles;
+    private Collection<Vehicle> vehicles = new ArrayList<>();
 
     @OneToMany(mappedBy = "id.organization") // Mapped by the related entity (Employment) through part of its composite key (id.organization)
-    private Collection<Employment> employments;
+    private Collection<Employment> employments = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY) // TODO check why lazy load here
     @JoinTable(
             name = J_ORGANIZATION_PARTS,
-            joinColumns = @JoinColumn(name = I_ORGANIZATION_PART_OF),
-            inverseJoinColumns = @JoinColumn(name = I_ORGANIZATION_PARTS)
+            joinColumns = @JoinColumn(name = I_ORGANIZATION_PARTS),
+            inverseJoinColumns = @JoinColumn(name = I_ORGANIZATION_PART_OF)
     )
-    private Collection<Organization> partOf;
+    private Collection<Organization> parts = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "partOf")
-    private Collection<Organization> parts;
+    @ManyToMany(mappedBy = "parts")
+    private Collection<Organization> partOf = new ArrayList<>();
 
     @Override
     public Long getId() {

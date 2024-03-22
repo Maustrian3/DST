@@ -4,41 +4,32 @@
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
                  version="2.2">
 
-<!--    <entity class="dst.ass1.jpa.model.impl.Trip" name="Trip">
+    <entity class="dst.ass1.jpa.model.impl.Trip" name="Trip">
         <attributes>
             <id name="id">
                 <generated-value strategy="IDENTITY"/>
             </id>
-            <basic name="created">
-                <temporal>TIMESTAMP</temporal>
-            </basic>
-            <basic name="updated">
-                <temporal>TIMESTAMP</temporal>
-            </basic>
-            <basic name="state" />
-            <one-to-one name="tripInfo" optional="true">
-                <join-column name="trip_id"/>
-            </one-to-one>
-            <many-to-many name="locations">
-                <join-table name="trip_location">
-                    <join-column name="trip_id"/>
-                    <inverse-join-column name="location_id"/>
-                </join-table>
-            </many-to-many>
-            <many-to-many name="locations" target-entity="your.package.name.Location">
-                <join-table name="trip_location">
-                    <join-column name="trip_id"/>
-                    <inverse-join-column name="location_id"/>
-                </join-table>
-            </many-to-many>
-            <many-to-many name="locations" target-entity="your.package.name.Location">
-                <join-table name="trip_location">
-                    <join-column name="trip_id"/>
-                    <inverse-join-column name="location_id"/>
-                </join-table>
-            </many-to-many>
+
+            <basic name="created"/>
+            <basic name="updated"/>
+
+            <basic name="state"/>
+
+            <many-to-one name="rider" target-entity="dst.ass1.jpa.model.impl.Rider"/>
+
+            <many-to-one name="pickup"/>
+
+            <many-to-one name="destination"/>
+
+            <one-to-one name="tripInfo" target-entity="dst.ass1.jpa.model.impl.TripInfo"
+            mapped-by="trip" orphan-removal="true"/>
+
+            <one-to-one name="match" target-entity="dst.ass1.jpa.model.impl.Match"
+            mapped-by="trip" optional="true" orphan-removal="true"/>
+
+            <many-to-many name="stops" target-entity="dst.ass1.jpa.model.impl.Location"/>
 
         </attributes>
-    </entity>-->
+    </entity>
 
 </entity-mappings>

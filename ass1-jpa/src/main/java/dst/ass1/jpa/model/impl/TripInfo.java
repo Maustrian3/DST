@@ -12,6 +12,7 @@ import static dst.ass1.jpa.util.Constants.*;
 @Entity
 public class TripInfo implements ITripInfo {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date completed;
@@ -27,8 +28,6 @@ public class TripInfo implements ITripInfo {
     private TripReceipt tripReceipt;
 
     @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @MapsId
-    @JoinColumn(name = I_TRIP)
     private Trip trip;
 
     @Override

@@ -27,8 +27,7 @@ public class Driver extends PlatformUser implements IDriver {
     private String tel;
 
     private Double avgRating;
-    @ManyToOne
-    @JoinColumn(name = I_VEHICLE, nullable = false)
+    @ManyToOne(optional = false)
     private Vehicle vehicle;
 
     @OneToMany(mappedBy = "id.driver") // Mapped by the related entity (Employment) through part of its composite key (id.driver)

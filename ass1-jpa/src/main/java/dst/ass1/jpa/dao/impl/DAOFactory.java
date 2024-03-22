@@ -24,8 +24,7 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public ILocationDAO createLocationDAO() {
-        // TODO
-        return null;
+        return new LocationDAO(em);
     }
 
     @Override
@@ -40,20 +39,17 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public IRiderDAO createRiderDAO() {
-        // TODO
-        return null;
+        return new RiderDAO(em);
     }
 
     @Override
     public ITripDAO createTripDAO() {
-        // TODO
-        return null;
+        return new TripDAO(em);
     }
 
     @Override
     public ITripInfoDAO createTripInfoDAO() {
-        // TODO
-        return null;
+        return new TripInfoDAO(em);
     }
 
     @Override
@@ -63,13 +59,11 @@ public class DAOFactory implements IDAOFactory {
 
     @Override
     public ITripReceiptDAO createTripReceiptDAO() {
-        // TODO
-        return null;
+        return new TripReceiptDAO(em);
     }
 
     @Override
     public IPaymentInfoDAO createPaymentInfoDAO() {
-        // TODO
-        return null;
+        return new PaymentInfoDAO(em);
     }
 }

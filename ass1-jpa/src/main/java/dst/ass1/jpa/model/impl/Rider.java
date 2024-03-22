@@ -17,15 +17,16 @@ import static dst.ass1.jpa.util.Constants.I_PAYMENT_INFO;
 public class Rider extends PlatformUser implements IRider {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     private byte[] password;
 
     @OneToMany
-    @JoinColumn(name = I_PAYMENT_INFO, nullable = false)
     private Collection<PaymentInfo> paymentInfos = new ArrayList<>();
 
     @OneToMany(mappedBy = "rider")

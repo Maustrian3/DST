@@ -2,23 +2,16 @@ package dst.ass1.jpa.model.impl;
 
 import dst.ass1.jpa.model.IPlatformUser;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-// Inheritance strategy join used as
-// - Mapped superclass doesn't allow the children to have relations
-// - single table doesn't allow not null constraints
-// - Table per class needs UNION queries, which has even worse performance
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public class PlatformUser implements IPlatformUser {
+@MappedSuperclass
+public abstract class PlatformUser implements IPlatformUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Column(name = "name")
     private String name;
 
     @NotNull
