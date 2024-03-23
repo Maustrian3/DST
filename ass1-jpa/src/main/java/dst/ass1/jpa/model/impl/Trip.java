@@ -12,7 +12,6 @@ import java.util.Date;
 
 import static dst.ass1.jpa.util.Constants.*;
 
-@Entity
 public class Trip implements ITrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
