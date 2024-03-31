@@ -20,7 +20,10 @@ public class MatchDAO implements IMatchDAO {
 
     @Override
     public IMatch findById(Long id) {
-        return em.find(IMatch.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Match.class, id);
     }
 
     @Override

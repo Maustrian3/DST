@@ -18,7 +18,10 @@ public class DriverDAO implements IDriverDAO {
 
     @Override
     public IDriver findById(Long id) {
-        return em.find(IDriver.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Driver.class, id);
     }
 
     @Override

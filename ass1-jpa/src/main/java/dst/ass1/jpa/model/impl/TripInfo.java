@@ -10,6 +10,22 @@ import java.util.Date;
 import static dst.ass1.jpa.util.Constants.*;
 
 @Entity
+@NamedQuery(
+        name = "averageRatingByRider",
+        query = "SELECT r.id, AVG(t.riderRating) " +
+                "FROM TripInfo t " +
+                "JOIN t.trip trip " +
+                "JOIN trip.rider r " +
+                "GROUP BY r " +
+                "ORDER BY AVG(t.riderRating) DESC"
+)
+@NamedQuery(
+        name = "findTripInfoWithinTimeRange",
+        query = "SELECT t.rider " +
+                "FROM TripInfo ti " +
+                "JOIN ti.trip t " +
+                "WHERE ti.completed BETWEEN :startDate AND :endDate"
+)
 public class TripInfo implements ITripInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

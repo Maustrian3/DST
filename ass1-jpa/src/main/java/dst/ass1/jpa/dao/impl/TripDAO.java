@@ -3,11 +3,14 @@ package dst.ass1.jpa.dao.impl;
 import dst.ass1.jpa.dao.ITripDAO;
 import dst.ass1.jpa.model.ITrip;
 import dst.ass1.jpa.model.TripState;
+import dst.ass1.jpa.model.impl.Rider;
 import dst.ass1.jpa.model.impl.Trip;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NamedQuery;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TripDAO implements ITripDAO {
 
@@ -19,7 +22,10 @@ public class TripDAO implements ITripDAO {
 
     @Override
     public ITrip findById(Long id) {
-        return em.find(ITrip.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Trip.class, id);
     }
 
     @Override
@@ -30,9 +36,12 @@ public class TripDAO implements ITripDAO {
 
     @Override
     public List<ITrip> findByStatus(TripState state) {
+        if (state == null) {
+            throw new IllegalArgumentException("State must be provided");
+        }
         return new ArrayList<>(
-                em.createQuery("SELECT t FROM Trip t WHERE t.state = :state", Trip.class)
-                        .setParameter("state", state)
-                        .getResultList());
+                em.createNamedQuery("tripsByStatus", Trip.class)
+                .setParameter("state", state)
+                .getResultList());
     }
 }

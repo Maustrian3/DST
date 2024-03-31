@@ -20,7 +20,10 @@ public class OrganizationDAO implements IOrganizationDAO {
 
     @Override
     public IOrganization findById(Long id) {
-        return em.find(IOrganization.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Organization.class, id);
     }
 
     @Override

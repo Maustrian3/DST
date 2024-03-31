@@ -12,6 +12,10 @@ import java.util.Date;
 
 import static dst.ass1.jpa.util.Constants.*;
 
+@NamedQuery(
+        name = "tripsByStatus",
+        query = "SELECT t FROM Trip t WHERE t.state = :state"
+)
 public class Trip implements ITrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

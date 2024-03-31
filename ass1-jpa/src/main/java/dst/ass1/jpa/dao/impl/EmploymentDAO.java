@@ -20,7 +20,10 @@ public class EmploymentDAO implements IEmploymentDAO {
 
     @Override
     public IEmployment findById(Long id) {
-        return em.find(IEmployment.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Employment.class, id);
     }
 
     @Override

@@ -44,8 +44,8 @@ public class Ass1_1_2_01Test {
         assertTrue(orm.getDatabaseGateway().isIndex(Constants.T_RIDER, Constants.M_RIDER_EMAIL, false));
         assertTrue(orm.getDatabaseGateway().isComposedIndex(Constants.T_RIDER, Constants.M_RIDER_NAME, Constants.M_RIDER_EMAIL));
 
-        assertFalse(orm.getDatabaseGateway().isNullable(Constants.T_RIDER, Constants.M_RIDER_NAME));
         assertFalse(orm.getDatabaseGateway().isNullable(Constants.T_RIDER, Constants.M_RIDER_EMAIL));
+        assertFalse(orm.getDatabaseGateway().isNullable(Constants.T_RIDER, Constants.M_RIDER_NAME));
     }
 
     private MessageDigest getMessageDigest() {

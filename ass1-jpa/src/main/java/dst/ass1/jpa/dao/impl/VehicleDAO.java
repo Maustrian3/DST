@@ -20,7 +20,10 @@ public class VehicleDAO implements IVehicleDAO {
 
     @Override
     public IVehicle findById(Long id) {
-        return em.find(IVehicle.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Vehicle.class, id);
     }
 
     @Override

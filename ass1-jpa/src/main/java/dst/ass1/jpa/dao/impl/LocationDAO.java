@@ -18,7 +18,10 @@ public class LocationDAO implements ILocationDAO {
 
     @Override
     public ILocation findById(Long id) {
-        return em.find(ILocation.class, id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID must be provided");
+        }
+        return em.find(Location.class, id);
     }
 
     @Override
