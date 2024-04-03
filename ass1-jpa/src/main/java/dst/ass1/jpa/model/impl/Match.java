@@ -20,7 +20,7 @@ public class Match implements IMatch {
     private Date date;
 
     @Embedded
-    private IMoney fare;
+    private Money fare;
 
     @ManyToOne(optional = false)
     private Vehicle vehicle;
@@ -57,7 +57,7 @@ public class Match implements IMatch {
     }
 
     public void setFare(IMoney fare) {
-        this.fare = fare;
+        this.fare = (Money) fare;
     }
 
     @Override

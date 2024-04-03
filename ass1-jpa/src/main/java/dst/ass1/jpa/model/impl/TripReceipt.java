@@ -16,17 +16,27 @@ public class TripReceipt implements ITripReceipt {
     private Long id;
 
     @Embedded
-    private IMoney total;
+    private Money total;
 
     @Embedded
-    private IMoney tip;
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = AO_NAME_TIP_CURRENCY,
+                    column = @Column(name = AO_COLUMN_NAME_TIP_CURRENCY)),
+            @AttributeOverride(
+                    name = AO_NAME_TIP_CURRENCY_VALUE,
+                    column = @Column(name = AO_COLUMN_NAME_TIP_CURRENCY_VALUE))
+    })
+    private Money tip;
 
     private Boolean paid;
 
-    @OneToOne(optional = false)
-    @MapsId
-    @JoinColumn(name = I_TRIP_RECEIPT)
+    @OneToOne(mappedBy = "tripReceipt", optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "tripInfo_id")
     private TripInfo tripInfo;
+
+    @Column(name = "tripInfo_id", insertable = false, updatable = false)
+    private Long tripInfoId;
 
     @ManyToOne(optional = false)
     private PaymentInfo paymentInfo;
@@ -48,7 +58,7 @@ public class TripReceipt implements ITripReceipt {
 
     @Override
     public void setTotal(IMoney total) {
-        this.total = total;
+        this.total = (Money) total;
     }
 
     @Override
@@ -58,7 +68,7 @@ public class TripReceipt implements ITripReceipt {
 
     @Override
     public void setTip(IMoney tip) {
-        this.tip = tip;
+        this.tip = (Money) tip;
     }
 
     @Override

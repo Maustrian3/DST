@@ -39,8 +39,7 @@ public class TripInfo implements ITripInfo {
 
     private Integer riderRating;
 
-    @OneToOne(mappedBy = "tripInfo", optional = false, cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     private TripReceipt tripReceipt;
 
     @OneToOne(optional = false, cascade = CascadeType.ALL)

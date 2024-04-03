@@ -11,7 +11,9 @@ import dst.ass1.jpa.util.TupleResult;
 import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,19 +36,29 @@ public class TripReceiptDAO implements ITripReceiptDAO {
         Join<TripReceipt, PaymentInfo> paymentInfoJoin = tripReceiptRoot.join("paymentInfo");
 
         // Define selection for grouping by PaymentMethod and calculating average tip percentage
-        Expression<PaymentMethod> paymentMethodExpr = paymentInfoJoin.get("paymentMethod");
-        Expression<Double> avgTipPercentageExpr = cb.avg(cb.quot(
-                cb.prod(
-                        cb.diff(tripReceiptRoot.get("tip").get("currencyValue"), tripReceiptRoot.get("total").get("currencyValue")),
-                        100),
-                tripReceiptRoot.get("total").get("currencyValue")));
+        Expression<PaymentMethod> paymentMethodExpr = paymentInfoJoin.get("method");
+
+        Expression<BigDecimal> totalAmount = tripReceiptRoot.get("total").get("currencyValue");
+        Expression<BigDecimal> tipAmount = tripReceiptRoot.get("tip").get("currencyValue");
+
+        // ((totalAmount - tipAmount) * 100) / totalAmount
+        Expression<BigDecimal> difference = cb.diff(totalAmount, tipAmount);
+        Expression<Number> tipPercentage = cb.quot(cb.prod(difference, 100), totalAmount);
+        Expression<Double> avgTipPercentageExpr = cb.avg(tipPercentage);
 
         query.multiselect(paymentMethodExpr, avgTipPercentageExpr);
         query.groupBy(paymentMethodExpr);
 
         // Apply optional criteria for time range
-        if (start != null && end != null) {
-            query.where(cb.between(tripInfoJoin.get("completed"), start, end));
+        List<Predicate> predicates = new ArrayList<>();
+        if (start != null) {
+            predicates.add(cb.greaterThanOrEqualTo(tripInfoJoin.get("completed"), start));
+        }
+        if (end != null) {
+            predicates.add(cb.lessThanOrEqualTo(tripInfoJoin.get("completed"), end));
+        }
+        if (!predicates.isEmpty()) {
+            query.where(predicates.toArray(new Predicate[0]));
         }
 
         // Define ordering by average tip percentage in descending order
@@ -57,9 +69,10 @@ public class TripReceiptDAO implements ITripReceiptDAO {
 
         // Cast Tuple objects to TupleResult objects
         List<TupleResult<PaymentMethod, Double>> tupleResultList = new ArrayList<>();
-        for (Tuple tuple : resultList) {
+        for (int i = resultList.size() - 1; i >= 0; i--) {
+            Tuple tuple = resultList.get(i);
             PaymentMethod paymentMethod = tuple.get(paymentMethodExpr);
-            Double avgTipPercentage = tuple.get(avgTipPercentageExpr);
+            Double avgTipPercentage = 100.0 - tuple.get(avgTipPercentageExpr);
             tupleResultList.add(new TupleResult<>(paymentMethod, avgTipPercentage));
         }
 
