@@ -41,9 +41,9 @@ public class TripReceiptDAO implements ITripReceiptDAO {
         Expression<BigDecimal> totalAmount = tripReceiptRoot.get("total").get("currencyValue");
         Expression<BigDecimal> tipAmount = tripReceiptRoot.get("tip").get("currencyValue");
 
-        // ((totalAmount - tipAmount) * 100) / totalAmount
-        Expression<BigDecimal> difference = cb.diff(totalAmount, tipAmount);
-        Expression<Number> tipPercentage = cb.quot(cb.prod(difference, 100), totalAmount);
+        // tipAmount / totalAmount * 100
+        Expression<Number> tipPercentage = cb.prod(cb.quot(tipAmount, totalAmount), 100);
+
         Expression<Double> avgTipPercentageExpr = cb.avg(tipPercentage);
 
         query.multiselect(paymentMethodExpr, avgTipPercentageExpr);
@@ -69,10 +69,9 @@ public class TripReceiptDAO implements ITripReceiptDAO {
 
         // Cast Tuple objects to TupleResult objects
         List<TupleResult<PaymentMethod, Double>> tupleResultList = new ArrayList<>();
-        for (int i = resultList.size() - 1; i >= 0; i--) {
-            Tuple tuple = resultList.get(i);
+        for (Tuple tuple : resultList) {
             PaymentMethod paymentMethod = tuple.get(paymentMethodExpr);
-            Double avgTipPercentage = 100.0 - tuple.get(avgTipPercentageExpr);
+            Double avgTipPercentage = tuple.get(avgTipPercentageExpr);
             tupleResultList.add(new TupleResult<>(paymentMethod, avgTipPercentage));
         }
 

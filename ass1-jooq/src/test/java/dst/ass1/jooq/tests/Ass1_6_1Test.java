@@ -118,4 +118,18 @@ public class Ass1_6_1Test {
 
         assertEquals(List.of(riderPreference, riderPreference2), riderPreferenceDAO.findAll());
     }
+
+    @Test
+    public void allowsToFindRiderById() {
+        var riderPreference2 = modelFactory.createRiderPreference();
+        riderPreference2.setRiderId(2L);
+        riderPreference2.setArea("Graz");
+        riderPreference2.setVehicleClass("standard");
+        riderPreference2.setPreferences(Map.of("foo", "bar"));
+
+        riderPreferenceDAO.insert(riderPreference);
+        riderPreferenceDAO.insert(riderPreference2);
+
+        assertEquals(riderPreferenceDAO.findById(riderPreference.getRiderId()), riderPreference);
+    }
 }
