@@ -32,23 +32,25 @@ public class DocumentQuery implements IDocumentQuery {
         // Get the collection from the database
         MongoCollection<Document> monogoCol = monogoDb.getCollection(Constants.COLL_LOCATION_DATA);
 
+        // Define the example query to match documents of type "place"
+        Document exampleQuery = new Document("type", "place");
+
+        // Define the projection to include the "category" field and calculate the opening hours
+        Document projection = new Document("$project", new Document()
+                .append("category", 1)
+                .append("openingHours", new Document("$subtract", Arrays.asList("$closingHour", "$openHour"))));
+
+        // Define the grouping to group by "category" and calculate the average opening hours
+        Document grouping = new Document("$group", new Document()
+                .append("_id", "$category")
+                .append("value", new Document("$avg", "$openingHours")));
+
+        // Execute the aggregation pipeline
         List<Document> documents = new ArrayList<>();
-        // Print all keys (fields) of the sample document
-        monogoCol.aggregate(List.of(
-
-                // Stage 1: Get all documents of type "place"
-                match(eq("type", "place")),
-
-                // Stage 2: Restrict returned fields and calculate the opening hours
-                project(fields(
-                        include("category"),
-                        computed("openingHours",
-                                new Document("$subtract", Arrays.asList("$closingHour", "$openHour"))
-                        )
-                )),
-
-                // Stage 3: Group by name and calculate the average opening hours
-                group("$category", avg("value", "$openingHours"))
+        monogoCol.aggregate(Arrays.asList(
+                match(exampleQuery), // Stage 1: Get all documents of type "place"
+                projection, // Stage 2: Restrict returned fields and calculate the opening hours
+                grouping // Stage 3: Group by name and calculate the average opening hours
         )).into(documents);
 
         // Logging output
@@ -59,25 +61,25 @@ public class DocumentQuery implements IDocumentQuery {
         return documents;
     }
 
+
     @Override
     public List<Document> findDocumentsByNameWithinPolygon(String name, List<List<Double>> polygon) {
         // Get the collection from the database
         MongoCollection<Document> monogoCol = monogoDb.getCollection(Constants.COLL_LOCATION_DATA);
 
-        List<Document> documents = new ArrayList<>();
-        monogoCol.find(and(
-                        geoWithinPolygon("geo", polygon),
-                        // Escape special characters in name and form regex query
-                        regex("name", ".*" + Pattern.quote(name) + ".*")
-                ))
-                .projection(
-                        fields(
-                                include("location_id"),
-                                excludeId()
-                        )
+        // Create an example query to match documents within the specified polygon and with the specified name
+        Document exampleQuery = new Document("$and", Arrays.asList(
+                new Document("geo", new Document("$geoWithin", new Document("$polygon", polygon))),
+                // Escape special characters in name and form regex query
+                new Document("name", new Document("$regex", ".*" + Pattern.quote(name) + ".*"))
+        ));
 
-                )
-                .into(documents);
+        // Create a projection to include "location_id" field and exclude "_id" field
+        Document projection = new Document("location_id", 1).append("_id", 0);
+
+        // Execute the example query with projection and convert the results into a list of documents
+        List<Document> documents = new ArrayList<>();
+        monogoCol.find(exampleQuery).projection(projection).into(documents);
 
         // Logging output
         for (Document document : documents) {
@@ -87,18 +89,18 @@ public class DocumentQuery implements IDocumentQuery {
         return documents;
     }
 
+
     @Override
     public List<Document> findDocumentsByType(String type) {
         // Get the collection from the database
         MongoCollection<Document> monogoCol = monogoDb.getCollection(Constants.COLL_LOCATION_DATA);
 
-        // Create a filter to match documents where the "type" field equals the specified value
-        Document filter = new Document("type", type);
+        // Create an example query to match documents where the "type" field equals the specified value
+        Document exampleQuery = new Document("type", type);
 
-        // Use the filter and convert into list of documents
+        // Execute the example query and convert the results into a list of documents
         List<Document> documents = new ArrayList<>();
-        monogoCol.find(filter).into(documents);
-        ;
+        monogoCol.find(exampleQuery).into(documents);
 
         return documents;
     }

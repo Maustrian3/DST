@@ -13,10 +13,10 @@ import java.util.Map;
 
 public class DocumentRepository implements IDocumentRepository {
 
-    private MongoDatabase monogoDb = new MongoClient().getDatabase(Constants.MONGO_DB_NAME);
-
     @Override
     public void insert(ILocation location, Map<String, Object> locationProperties) {
+        MongoDatabase monogoDb = new MongoClient().getDatabase(Constants.MONGO_DB_NAME);
+
         // Get the collection from the database
         MongoCollection<Document> monogoCol = monogoDb.getCollection(Constants.COLL_LOCATION_DATA);
 
@@ -32,6 +32,6 @@ public class DocumentRepository implements IDocumentRepository {
 
         // Add appropriate indices for efficient retrieval
         monogoCol.createIndex(Indexes.ascending("location_id"));
-        monogoCol.createIndex(Indexes.geo2dsphere("geo")); // Assuming there's a "geo" field for geospatial queries
+        monogoCol.createIndex(Indexes.geo2dsphere("geo"));
     }
 }
