@@ -35,6 +35,7 @@ public class TripReceipt implements ITripReceipt {
     @JoinColumn(name = "tripInfo_id")
     private TripInfo tripInfo;
 
+    // Foreign key for TripInfo 1:1 relationship
     @Column(name = "tripInfo_id", insertable = false, updatable = false)
     private Long tripInfoId;
 

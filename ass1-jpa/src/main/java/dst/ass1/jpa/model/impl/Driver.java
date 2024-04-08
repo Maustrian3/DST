@@ -20,51 +20,12 @@ public class Driver extends PlatformUser implements IDriver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private String name;
-
-    @NotNull
-    private String tel;
-
-    private Double avgRating;
     @ManyToOne(optional = false)
     private Vehicle vehicle;
 
-    @OneToMany(mappedBy = "id.driver") // Mapped by the related entity (Employment) through part of its composite key (id.driver)
+    // Mapped by the related entity (Employment) through part of its composite key (id.driver)
+    @OneToMany(mappedBy = "id.driver")
     private Collection<Employment> employments = new ArrayList<>();
-
-//    @ManyToMany(mappedBy = "trip") // TODO Check is this no needed here? No methods for it in interface
-//    private Collection<Trip> trips;
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getTel() {
-        return tel;
-    }
-
-    @Override
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    @Override
-    public Double getAvgRating() {
-        return avgRating;
-    }
-
-    @Override
-    public void setAvgRating(Double avgRating) {
-        this.avgRating = avgRating;
-    }
 
     @Override
     public Collection<IEmployment> getEmployments() {

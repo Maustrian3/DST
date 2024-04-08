@@ -24,7 +24,8 @@ public class Organization implements IOrganization {
     @OneToMany(mappedBy = "id.organization") // Mapped by the related entity (Employment) through part of its composite key (id.organization)
     private Collection<Employment> employments = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY) // TODO check why lazy load here
+    // Lazy fetch to avoid loading all parent organizations when loading a child organization
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = J_ORGANIZATION_PARTS,
             joinColumns = @JoinColumn(name = I_ORGANIZATION_PARTS),

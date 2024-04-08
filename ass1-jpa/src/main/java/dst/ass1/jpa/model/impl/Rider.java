@@ -33,7 +33,6 @@ public class Rider extends PlatformUser implements IRider {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-
     @Column(length = 20)
     private byte[] password;
 
