@@ -19,10 +19,6 @@ import static dst.ass1.jpa.util.Constants.I_PAYMENT_INFO;
         name = "riderByEmail",
         query = "SELECT r FROM Rider r WHERE r.email = :email"
 )
-@NamedQuery(
-        name = "findAllRiders",
-        query = "SELECT r FROM Rider r"
-)
 public class Rider extends PlatformUser implements IRider {
 
     @Id

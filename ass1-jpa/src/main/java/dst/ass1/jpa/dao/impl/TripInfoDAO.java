@@ -34,7 +34,7 @@ public class TripInfoDAO implements ITripInfoDAO {
     }
 
     @Override
-    public List<TupleResult<Long, Double>> findRidersAverageRating() { // TODO do further testing
+    public List<TupleResult<Long, Double>> findRidersAverageRating() {
         TypedQuery<Object[]> query = em.createNamedQuery("averageRatingByRider", Object[].class);
         List<Object[]> resultList = query.getResultList();
 

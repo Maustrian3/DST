@@ -37,8 +37,8 @@ public class RiderDAO implements IRiderDAO {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Start and end dates must be provided");
         }
-        TypedQuery<Rider> riderQuery = em.createNamedQuery("findAllRiders", Rider.class);
-        List<Rider> allRiders = riderQuery.getResultList();
+
+        List<IRider> allRiders = this.findAll();
 
         TypedQuery<Rider> tripInfoQuery = em.createNamedQuery("findTripInfoWithinTimeRange", Rider.class)
                 .setParameter("startDate", start)

@@ -41,11 +41,12 @@ public class TripReceiptDAO implements ITripReceiptDAO {
         Expression<BigDecimal> totalAmount = tripReceiptRoot.get("total").get("currencyValue");
         Expression<BigDecimal> tipAmount = tripReceiptRoot.get("tip").get("currencyValue");
 
-        // tipAmount / totalAmount * 100
+        // (tipAmount / totalAmount) * 100
         Expression<Number> tipPercentage = cb.prod(cb.quot(tipAmount, totalAmount), 100);
 
         Expression<Double> avgTipPercentageExpr = cb.avg(tipPercentage);
 
+        // Define query structure
         query.multiselect(paymentMethodExpr, avgTipPercentageExpr);
         query.groupBy(paymentMethodExpr);
 
