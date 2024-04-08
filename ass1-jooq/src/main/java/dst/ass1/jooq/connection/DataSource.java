@@ -18,9 +18,14 @@ public class DataSource {
 
     static {
         var hikariConfig = new HikariConfig();
+        // Set the JDBC URL to connect to the H2 database located at '/tmp/database/dst'
         hikariConfig.setJdbcUrl("jdbc:h2:/tmp/database/dst");
         var hikariDataSource = new HikariDataSource(hikariConfig);
         var dslConfig = new DefaultConfiguration();
+        // Enable optimistic locking for generated SQL statements
+        // Optimistic locking: It assumes that conflicts between transactions are infrequent and
+        // handles them only when they occur, as opposed to pessimistic locking,
+        // which locks data preemptively to prevent conflicts.
         var setting = new Settings().withExecuteWithOptimisticLocking(true);
         dslConfig.set(hikariDataSource);
         dslConfig.set(SQLDialect.H2);

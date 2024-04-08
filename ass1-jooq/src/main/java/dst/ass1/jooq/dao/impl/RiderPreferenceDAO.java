@@ -7,6 +7,7 @@ import dst.ass1.jooq.model.impl.RiderPreference;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,20 +32,22 @@ public class RiderPreferenceDAO implements IRiderPreferenceDAO {
     public IRiderPreference findById(Long id) {
         DSLContext dslContext = getConnection();
 
-        var record = dslContext.select()
+        // Find the rider record
+        Record riderRecord = dslContext.select()
                 .from(RIDER_PREFERENCE)
                 .where(RIDER_PREFERENCE.RIDER_ID.eq(id))
                 .fetchOne();
 
-        if (record == null) {
+        if (riderRecord == null) {
             return null;
         }
 
         RiderPreference riderPreference = new RiderPreference();
-        riderPreference.setRiderId(record.get(RIDER_PREFERENCE.RIDER_ID));
-        riderPreference.setVehicleClass(record.get(RIDER_PREFERENCE.VEHICLE_CLASS));
-        riderPreference.setArea(record.get(RIDER_PREFERENCE.AREA));
+        riderPreference.setRiderId(riderRecord.get(RIDER_PREFERENCE.RIDER_ID));
+        riderPreference.setVehicleClass(riderRecord.get(RIDER_PREFERENCE.VEHICLE_CLASS));
+        riderPreference.setArea(riderRecord.get(RIDER_PREFERENCE.AREA));
 
+        // Find the preferences associated with the rider
         Map<String, String> preferences = dslContext.select(PREFERENCE.PREF_KEY, PREFERENCE.PREF_VALUE)
                 .from(PREFERENCE)
                 .where(PREFERENCE.RIDER_ID.eq(id))
@@ -59,39 +62,40 @@ public class RiderPreferenceDAO implements IRiderPreferenceDAO {
     public List<IRiderPreference> findAll() {
         var dslContext = getConnection();
 
-        var records = dslContext.select()
+        List<Record> riderRecords = dslContext.select()
                 .from(RIDER_PREFERENCE
-                        .leftJoin(PREFERENCE)
+                        .leftJoin(PREFERENCE) // Left join to include riders with no preferences
                         .on(RIDER_PREFERENCE.RIDER_ID.eq(PREFERENCE.RIDER_ID)))
                 .fetch();
 
         Map<Long, RiderPreference> riderMap = new HashMap<>();
-        for (var record : records) {
+        for (Record record : riderRecords) {
             Long riderId = record.get(RIDER_PREFERENCE.RIDER_ID);
 
             // Put new rider into map if not already present
             if (!riderMap.containsKey(riderId)) {
-                var rider = new RiderPreference();
+                RiderPreference rider = new RiderPreference();
                 rider.setRiderId(riderId);
                 rider.setVehicleClass(record.get(RIDER_PREFERENCE.VEHICLE_CLASS));
                 rider.setArea(record.get(RIDER_PREFERENCE.AREA));
                 riderMap.put(riderId, rider);
             }
 
-            // Skip if rider has no linked preferences
-            if (record.get(PREFERENCE.PREF_KEY) == null) continue;
+            // Add linked preferences if they exist
+            if (record.get(PREFERENCE.PREF_KEY) != null) {
 
-            var rider = riderMap.get(riderId);
+                RiderPreference rider = riderMap.get(riderId);
 
-            // If rider has no preferences set yet, create a new map
-            if (rider.getPreferences() == null)
-                rider.setPreferences(new HashMap<>());
+                // If rider has no preferences set yet, create a new map
+                if (rider.getPreferences() == null)
+                    rider.setPreferences(new HashMap<>());
 
-            // Add preferences to rider
-            rider.getPreferences().put(
-                    record.get(PREFERENCE.PREF_KEY),
-                    record.get(PREFERENCE.PREF_VALUE)
-            );
+                // Add preferences to rider
+                rider.getPreferences().put(
+                        record.get(PREFERENCE.PREF_KEY),
+                        record.get(PREFERENCE.PREF_VALUE)
+                );
+            }
         }
 
         // Return all rider preferences
@@ -100,7 +104,7 @@ public class RiderPreferenceDAO implements IRiderPreferenceDAO {
 
     @Override
     public IRiderPreference insert(IRiderPreference model) {
-        var dslContext = getConnection();
+        DSLContext dslContext = getConnection();
 
         dslContext.transaction((Configuration trx) -> {
             // Insert Rider Preference
@@ -165,17 +169,6 @@ public class RiderPreferenceDAO implements IRiderPreferenceDAO {
                     .set(RIDER_PREFERENCE.AREA, model.getArea())
                     .where(RIDER_PREFERENCE.RIDER_ID.eq(model.getRiderId()))
                     .execute();
-
-            // Update or insert preferences
-//            for (var e : model.getPreferences().entrySet()) {
-//                trx.dsl().insertInto(PREFERENCE)
-//                        .set(PREFERENCE.RIDER_ID, model.getRiderId())
-//                        .set(PREFERENCE.PREF_VALUE, e.getValue())
-//                        .set(PREFERENCE.PREF_KEY, e.getKey())
-//                        .onDuplicateKeyUpdate()
-//                        .set(PREFERENCE.PREF_VALUE, e.getValue())
-//                        .execute();
-//            }
 
             // Update or insert preferences
             for (var e : model.getPreferences().entrySet()) {
