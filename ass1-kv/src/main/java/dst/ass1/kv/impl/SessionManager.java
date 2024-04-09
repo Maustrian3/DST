@@ -27,18 +27,20 @@ public class SessionManager implements ISessionManager {
             // Set up a transaction
             // Watch the user id to ensure that no other session is created for the same user
             jedis.watch(userId.toString());
-            // Create a transaction
+
             Transaction transaction = jedis.multi();
 
             String sessionToken = UUID.randomUUID().toString();
+
             Map<String, String> value = Map.of(
                     "userId", userId.toString(),
                     "timeToLive", ((Integer) timeToLive).toString()
             );
 
-            // Set session metadata and user id and their expiration time
+            // Use redis hash to store session metadata
             transaction.hmset(sessionToken, value);
             transaction.expire(sessionToken, timeToLive);
+            // Use redis string to store the session token for each user
             transaction.set(userId.toString(), sessionToken);
             transaction.expire(userId.toString(), timeToLive);
 
@@ -54,7 +56,9 @@ public class SessionManager implements ISessionManager {
     @Override
     public void setSessionVariable(String sessionId, String key, String value) throws SessionNotFoundException {
         try (var jedis = pool.getResource()) {
-            if (!jedis.exists(sessionId)) throw new SessionNotFoundException();
+            if (!jedis.exists(sessionId)) {
+                throw new SessionNotFoundException();
+            }
             jedis.hset(sessionId, key, value);
         } catch (JedisException e) {
             throw new SessionNotFoundException("Failed to set session variable", e);
@@ -64,7 +68,9 @@ public class SessionManager implements ISessionManager {
     @Override
     public String getSessionVariable(String sessionId, String key) throws SessionNotFoundException {
         try (var jedis = pool.getResource()) {
-            if (!jedis.exists(sessionId)) throw new SessionNotFoundException();
+            if (!jedis.exists(sessionId)){
+                throw new SessionNotFoundException();
+            }
             return jedis.hget(sessionId, key);
         } catch (JedisException e) {
             throw new SessionNotFoundException("Failed to get session variable", e);
@@ -101,6 +107,6 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public void close() {
-
+        pool.close();
     }
 }
