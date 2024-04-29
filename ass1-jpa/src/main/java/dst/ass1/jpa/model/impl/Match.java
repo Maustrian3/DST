@@ -12,6 +12,14 @@ import java.util.Date;
 import static dst.ass1.jpa.util.Constants.*;
 
 @Entity
+@NamedQuery(
+        name = "findMatchByDriverAndStates",
+        query = "SELECT m " +
+                "FROM Match m " +
+                "JOIN m.trip t " +
+                "WHERE m.driver = :driver " +
+                "AND t.state IN :states"
+)
 public class Match implements IMatch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

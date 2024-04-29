@@ -2,6 +2,7 @@ package dst.ass1.jpa.dao.impl;
 
 import dst.ass1.jpa.dao.IDriverDAO;
 import dst.ass1.jpa.model.IDriver;
+import dst.ass1.jpa.model.ITrip;
 import dst.ass1.jpa.model.impl.Driver;
 
 import javax.persistence.EntityManager;

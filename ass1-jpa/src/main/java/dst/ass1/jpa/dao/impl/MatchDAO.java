@@ -1,8 +1,10 @@
 package dst.ass1.jpa.dao.impl;
 
 import dst.ass1.jpa.dao.IMatchDAO;
+import dst.ass1.jpa.model.IDriver;
 import dst.ass1.jpa.model.IEmployment;
 import dst.ass1.jpa.model.IMatch;
+import dst.ass1.jpa.model.ITrip;
 import dst.ass1.jpa.model.impl.Employment;
 import dst.ass1.jpa.model.impl.Match;
 
@@ -30,5 +32,19 @@ public class MatchDAO implements IMatchDAO {
     public List<IMatch> findAll() {
         return new ArrayList<>(
                 em.createQuery("SELECT m FROM Match m", Match.class).getResultList());
+    }
+
+    public List<IMatch> findByDriverAndStates(Long driverId, List<String> states) {
+        if (driverId == null) {
+            throw new IllegalArgumentException("Driver must be provided");
+        }
+        if (states == null) {
+            throw new IllegalArgumentException("States must be provided");
+        }
+        return new ArrayList<>(
+                em.createNamedQuery("findMatchByDriverAndStates", Match.class)
+                        .setParameter("driver", driverId)
+                        .setParameter("states", states)
+                        .getResultList());
     }
 }
