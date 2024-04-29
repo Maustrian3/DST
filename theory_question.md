@@ -8,7 +8,7 @@ usually involved in software projects.
 
 #### Advantages of Annotations:
 
-- **Simple to Understand**: Annotations are directly written in Java code and therefore easier to understand.
+- **Simple to Understand**: Annotations are directly written in Java code
 - **Compile-Time Safety**: Annotations undergo compile-time checks, minimizing the risk of errors.
 - **Everything in one place**: Entity relations are directly defined where the entities and their properties are
   defined.
@@ -31,6 +31,13 @@ usually involved in software projects.
 In essence, annotations are good for simple configurations within code, while XML is better suited for more complex
 setups and when separating configuration from code is important.
 
+How to choose for software projects?
+
+1. **Project Requirements:** Consider the complexity of the project and the level of flexibility required for
+   configurations
+2. **Team Preferences and Skills**
+3. **Maintainability:** Consider long-term maintainability concerns
+
 ### 1.6.2. Entity Manager and Entity Lifecycle
 
 What is the lifecycle of a JPA entity, i.e., what are the different states an entity can be in? What EntityManager
@@ -38,10 +45,11 @@ operations change the state of an entity? How and when are changes to entities p
 
 ### Entity Lifecycle
 
+![Entity Lifecycle](./theory_ressources/Lifecycle-Model-1024x576.webp)
+
 JPA entities undergo various states as they interact with the persistence context:
 
-- **New (Transient)**: Entities are newly created but not associated with the persistence context. They exist only in
-  memory and haven't been persisted to the database yet.
+- **Transient (new)**: Entities are newly created only exist in memory and haven't been persisted to the database yet.
 
 - **Managed**: Entities become managed when they are associated with the persistence context. This occurs
   after retrieval from the database or persistence through `EntityManager`. In this state, any changes made to the
@@ -61,21 +69,24 @@ JPA entities undergo various states as they interact with the persistence contex
 
 The state of an entity can be altered through various EntityManager operations:
 
-- **Persist**: Associates a new entity with the persistence context, transitioning it to the managed state.
+- **Persist**: Transient -> Managed
 
-- **Merge**: Reattaches a detached entity to the persistence context, restoring its managed state.
+- **Merge**: Detached -> Managed
 
-- **Remove**: Marks a managed entity for removal, transitioning it to the removed state.
+- **Remove**: Managed -> Remove
 
-- **Find/Query**: Retrieves an entity from the database, making it managed within the context.
+- **Find/Query**: DB -> Managed
 
-- **Detach**: Disconnects a managed entity from the persistence context, moving it to the detached state.
+- **Detach**: Managed -> Detached
 
 ### Propagation of Changes to the Database
 
-Changes made to managed entities are propagated to the database during transaction commit or explicitly
-when `EntityManager.flush()` is invoked. This operation ensures that modifications are synchronized with the underlying
-database.
+On flush() the required SQL statements are generated and executed.
+
+ - Persist -> SQL INSERT/UPDATE
+ - Remove -> SQL DELETE
+
+https://thorben-janssen.com/entity-lifecycle-model/
 
 ### 1.6.3. Optimistic vs. Pessimistic Locking
 
@@ -103,11 +114,11 @@ locked data until the lock is released.
 ### When to use which Locking Mechanism?
 
 - **Optimistic Locking**:
-    - Best for situations with infrequent conflicts or where system performance is important.
+    - Best for situations with **infrequent conflicts** or where system performance is important.
     - Suitable for more reads than writes or when conflicts can be resolved without locking.
 
 - **Pessimistic Locking**:
-    - Ideal for scenarios with frequent conflicts, where ensuring data consistency is crucial.
+    - Ideal for scenarios with **frequent conflicts**, where ensuring **data consistency is crucial**.
     - Useful for preventing simultaneous access to important data or ensuring real-time data consistency.
 
 ### Potential Issues with Incorrect Usage
@@ -137,11 +148,11 @@ databases, two primary scaling strategies are commonly employed: vertical scalin
 Both MongoDB and Redis offer features to support horizontal scaling:
 
 - **Redis**:
-  - **Cluster Mode**: Redis facilitates horizontal scaling through its cluster mode, which distributes data across
-    multiple Redis instances or nodes. Each node manages a subset of the data, enabling Redis to handle larger
-    datasets and increased query loads effectively.
-  - **Replication**: Redis follows a master-replica architecture for replication. The master node is the primary Redis
-    instance responsible for handling read and write operations, while replica nodes replicate data from the master.
+    - **Cluster Mode**: Redis facilitates horizontal scaling through its cluster mode, which distributes data across
+      multiple Redis instances or nodes. Each node manages a subset of the data, enabling Redis to handle larger
+      datasets and increased query loads effectively.
+    - **Replication**: Redis follows a master-replica architecture for replication. The master node is the primary Redis
+      instance responsible for handling read and write operations, while replica nodes replicate data from the master.
 
 - **MongoDB**:
     - **Sharding**: MongoDB supports horizontal scaling through sharding, which partitions data across multiple servers
