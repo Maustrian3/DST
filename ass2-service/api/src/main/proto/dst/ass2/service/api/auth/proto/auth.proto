@@ -11,12 +11,11 @@ message AuthenticationRequest {
 }
 
 message AuthenticationResponse {
-  bool isAuthenticated = 1; // FIXME is this necessary?
-  string authToken = 2;
+  string authToken = 1;
 }
 
 message TokenValidationRequest {
-  string token = 1;
+  string authToken = 1;
 }
 
 message TokenValidationResponse {

@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +85,7 @@ public class CachingAuthenticationService implements ICachingAuthenticationServi
     }
 
     @Override
+    @Transactional
     public String authenticate(String email, String password) throws NoSuchUserException, AuthenticationException {
         byte[] passwordHash = passwordMap.get(email);
         if (passwordHash == null) {

@@ -2,31 +2,58 @@ package dst.ass2.service.auth.client.impl;
 
 import dst.ass2.service.api.auth.AuthenticationException;
 import dst.ass2.service.api.auth.NoSuchUserException;
+import dst.ass2.service.api.auth.proto.AuthServiceGrpc;
+import dst.ass2.service.api.auth.proto.AuthenticationRequest;
+import dst.ass2.service.api.auth.proto.TokenValidationRequest;
 import dst.ass2.service.auth.client.AuthenticationClientProperties;
 import dst.ass2.service.auth.client.IAuthenticationClient;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 
 public class GrpcAuthenticationClient implements IAuthenticationClient {
 
-    // TODO make use of the generated grpc sources to implement a blocking client
+    private ManagedChannel channel;
+    private AuthServiceGrpc.AuthServiceBlockingStub blockingStub;
 
     public GrpcAuthenticationClient(AuthenticationClientProperties properties) {
-        // TODO
+        channel = ManagedChannelBuilder.forAddress(properties.getHost(), properties.getPort())
+                .usePlaintext()
+                .build();
+        blockingStub = AuthServiceGrpc.newBlockingStub(channel);
     }
 
     @Override
     public String authenticate(String email, String password) throws NoSuchUserException, AuthenticationException {
-        // TODO
-        return null;
+        AuthenticationRequest request = AuthenticationRequest.newBuilder()
+                .setEmail(email)
+                .setPassword(password)
+                .build();
+        try {
+            return blockingStub.authenticate(request).getAuthToken();
+        } catch (StatusRuntimeException e) {
+            Status status = e.getStatus();
+            if (status == Status.NOT_FOUND) {
+                throw new NoSuchUserException();
+            } else if (status == Status.PERMISSION_DENIED) {
+                throw new AuthenticationException();
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public boolean isTokenValid(String token) {
-        // TODO
-        return false;
+        TokenValidationRequest request = TokenValidationRequest.newBuilder()
+                .setAuthToken(token)
+                .build();
+        return blockingStub.validateToken(request).getIsValid();
     }
 
     @Override
     public void close() {
-        // TODO
+        channel.shutdown();
     }
 }

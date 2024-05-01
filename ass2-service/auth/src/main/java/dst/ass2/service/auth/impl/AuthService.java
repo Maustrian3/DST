@@ -23,7 +23,6 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
         try {
             String authToken = authenticationService.authenticate(request.getEmail(), request.getPassword());
             responseBuilder.setAuthToken(authToken);
-            responseBuilder.setIsAuthenticated(true);
 
         } catch (NoSuchUserException e) {
             responseObserver.onError(Status.NOT_FOUND.asException());
@@ -38,6 +37,12 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
     @Override
     public void validateToken(TokenValidationRequest request, StreamObserver<TokenValidationResponse> responseObserver) {
-        super.validateToken(request, responseObserver);
+        TokenValidationResponse.Builder responseBuilder = TokenValidationResponse.newBuilder();
+
+        boolean isValid = authenticationService.isValid(request.getAuthToken());
+        responseBuilder.setIsValid(isValid);
+
+        responseObserver.onNext(responseBuilder.build());
+        responseObserver.onCompleted();
     }
 }
