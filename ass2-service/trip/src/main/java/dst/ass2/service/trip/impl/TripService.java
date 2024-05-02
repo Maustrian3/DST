@@ -134,6 +134,9 @@ public class TripService implements ITripService {
         ITrip tripModel;
         try {
             // Validate availability of the driver
+            if (match.getDriverId() == null) {
+                throw new IllegalStateException("Driver ID is required");
+            }
             driverModel = driverDAO.findById(match.getDriverId());
             if (driverModel == null) {
                 throw new EntityNotFoundException("Driver not found");
