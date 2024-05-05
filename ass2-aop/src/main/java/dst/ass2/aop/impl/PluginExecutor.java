@@ -5,6 +5,8 @@ import dst.ass2.aop.IPluginExecutor;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.jar.JarFile;
 
 public class PluginExecutor implements IPluginExecutor {
     private final List<File> monitoredDirectories;
@@ -80,10 +83,12 @@ public class PluginExecutor implements IPluginExecutor {
                             Path resolvedPath = path.resolve(changedFile);
 
                             // Only execute plugins which have been created before
-                            if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                                createdFiles.add(resolvedPath);
-                                // FIXME what if a file system only triggers a CREATE upon file creation?
-                            } else if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY && createdFiles.contains(resolvedPath)) {
+                            //if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                            //    createdFiles.add(resolvedPath);
+                            // } else // FIXME work with creation/modfy time to avoid multiple exectuion of same plugin
+
+                                if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE
+                                        || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                                 executePlugin(new File(resolvedPath.toString()));
                             }
                         }
@@ -99,12 +104,13 @@ public class PluginExecutor implements IPluginExecutor {
     }
 
     private void executePlugin(File jarFile) {
-        try {
-            JarClassLoader loader = new JarClassLoader(jarFile); // FIXME check implementation
+        ClassLoader parentClassLoader = getClass().getClassLoader();
+        try (JarClassLoader loader = new JarClassLoader(jarFile, parentClassLoader)) {
             List<Class<?>> pluginClasses = loader.loadClassesImplementing(IPluginExecutable.class);
 
             for (Class<?> pluginClass : pluginClasses) {
-                IPluginExecutable plugin = (IPluginExecutable) pluginClass.newInstance();
+                try {
+                IPluginExecutable plugin = (IPluginExecutable) pluginClass.getDeclaredConstructor().newInstance();
                 executorService.execute(() -> {
                     try {
                         plugin.execute();
@@ -112,6 +118,10 @@ public class PluginExecutor implements IPluginExecutor {
                         e.printStackTrace();
                     }
                 });
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                     InvocationTargetException e) {
+                e.printStackTrace();
+            }
             }
         } catch (Exception e) {
             e.printStackTrace();

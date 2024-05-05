@@ -14,11 +14,18 @@ import java.util.jar.JarFile;
 
 public class JarClassLoader extends URLClassLoader {
 
-    public JarClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, parent);
+    private final File jarFile;
+
+    public JarClassLoader(File jarFile, ClassLoader parent) throws IOException {
+        super(new URL[]{jarFile.toURI().toURL()}, parent);
+        this.jarFile = jarFile;
     }
 
-    public List<Class<?>> loadClassesImplementingIPluginExecutable(File jarFile) throws IOException, ClassNotFoundException {
+    /*
+    TODO: Take care of class loading: there must not be any problem with the concurrent execution of different plugins containing classes with equal names.
+
+     */
+    public List<Class<?>> loadClassesImplementing(Class<IPluginExecutable> interfaceClass) throws IOException, ClassNotFoundException {
         List<Class<?>> pluginClasses = new ArrayList<>();
 
         try (JarFile jar = new JarFile(jarFile)) {
@@ -26,12 +33,10 @@ public class JarClassLoader extends URLClassLoader {
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                    // Reformat class path into class name
                     String className = entry.getName().replace("/", ".").replaceAll("\\.class$", "");
                     Class<?> clazz = loadClass(className);
-                    // Is IPluginExecutable superinterface of clazz?
-                    if (IPluginExecutable.class.isAssignableFrom(clazz)) {
-                        pluginClasses.add(clazz);
+                    if (interfaceClass.isAssignableFrom(clazz)) {
+                        pluginClasses.add(clazz.asSubclass(interfaceClass));
                     }
                 }
             }
