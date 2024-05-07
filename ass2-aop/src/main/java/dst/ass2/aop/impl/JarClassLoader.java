@@ -21,11 +21,7 @@ public class JarClassLoader extends URLClassLoader {
         this.jarFile = jarFile;
     }
 
-    /*
-    TODO: Take care of class loading: there must not be any problem with the concurrent execution of different plugins containing classes with equal names.
-
-     */
-    public List<Class<?>> loadClassesImplementing(Class<IPluginExecutable> interfaceClass) throws IOException, ClassNotFoundException {
+    public List<Class<?>> loadClassesImplementing(Class<IPluginExecutable> interfaceClass) {
         List<Class<?>> pluginClasses = new ArrayList<>();
 
         try (JarFile jar = new JarFile(jarFile)) {
@@ -40,6 +36,8 @@ public class JarClassLoader extends URLClassLoader {
                     }
                 }
             }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
         return pluginClasses;

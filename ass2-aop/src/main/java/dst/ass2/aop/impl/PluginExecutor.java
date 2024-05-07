@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -51,6 +49,8 @@ public class PluginExecutor implements IPluginExecutor {
     }
 
     private void monitorDirectories() {
+        Map<Path, Long> recentlyLoaded = new HashMap<>();
+
         for (File dir : monitoredDirectories) {
             try {
                 WatchService watchService = FileSystems.getDefault().newWatchService();
@@ -63,10 +63,9 @@ public class PluginExecutor implements IPluginExecutor {
                         try {
                             key = watchService.take();
                         } catch (InterruptedException e) {
+                            // May be interrupted at any time
                             return;
                         }
-
-                        Set<Path> createdFiles = new HashSet<>(); // Keep track of executed files
 
                         for (WatchEvent<?> event : key.pollEvents()) {
                             // Skip if overflow occurs (events are discarded or lost because the event buffer is full)
@@ -74,23 +73,24 @@ public class PluginExecutor implements IPluginExecutor {
                                 continue;
                             }
 
-                            Path changedFile = (Path) event.context();
+                            Path changedFilePath = (Path) event.context();
 
-                            if (!changedFile.toString().endsWith(".jar")) {
+                            // Skip non jar files
+                            if (!changedFilePath.toString().endsWith(".jar")) {
                                 continue;
                             }
 
-                            Path resolvedPath = path.resolve(changedFile);
-
-                            // Only execute plugins which have been created before
-                            //if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                            //    createdFiles.add(resolvedPath);
-                            // } else // FIXME work with creation/modfy time to avoid multiple exectuion of same plugin
-
-                                if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE
-                                        || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                executePlugin(new File(resolvedPath.toString()));
+                            // Edge case: Some OS fire two events (ENTRY MODIFY and ENTRY CREATE) for the same file at creation
+                            // Skip if new event is older than already logged event
+                            if (recentlyLoaded.containsKey(changedFilePath)
+                                    && recentlyLoaded.get(changedFilePath) <= changedFilePath.toFile().lastModified()) {
+                                continue;
                             }
+
+                            recentlyLoaded.put(changedFilePath, path.toFile().lastModified());
+
+                            Path resolvedPath = path.resolve(changedFilePath);
+                            executePlugin(new File(resolvedPath.toString()));
                         }
 
                         key.reset();
@@ -98,7 +98,7 @@ public class PluginExecutor implements IPluginExecutor {
                 }, executorService);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e);
             }
         }
     }
@@ -110,21 +110,22 @@ public class PluginExecutor implements IPluginExecutor {
 
             for (Class<?> pluginClass : pluginClasses) {
                 try {
-                IPluginExecutable plugin = (IPluginExecutable) pluginClass.getDeclaredConstructor().newInstance();
-                executorService.execute(() -> {
-                    try {
-                        plugin.execute();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                     InvocationTargetException e) {
-                e.printStackTrace();
+                    IPluginExecutable plugin = (IPluginExecutable) pluginClass.getDeclaredConstructor().newInstance();
+                    executorService.execute(() -> {
+                        try {
+                            plugin.execute();
+                        } catch (Exception e) {
+                            System.out.println("Plugin had problem while executing:" + e.getMessage());
+                        }
+                    });
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    System.out.println("Can't create new plugin instance:" + e.getMessage());
+                } catch (NoSuchMethodException e) {
+                    System.out.println("Can't find constructor:" + e.getMessage());
+                }
             }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
