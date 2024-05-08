@@ -19,20 +19,12 @@ public class LockManager {
         return instance;
     }
 
-    public synchronized void lock(String lockName) {
-        Lock lock = locks.get(lockName);
+    public synchronized Lock getLock(String name) {
+        Lock lock = locks.get(name);
         if (lock == null) {
             lock = new ReentrantLock();
-            locks.put(lockName, lock);
+            locks.put(name, lock);
         }
-        lock.lock();
-    }
-
-    public synchronized void unlock(String lockName) {
-        Lock lock = locks.get(lockName);
-        if (lock == null) {
-            return;
-        }
-        lock.unlock();
+        return lock;
     }
 }
