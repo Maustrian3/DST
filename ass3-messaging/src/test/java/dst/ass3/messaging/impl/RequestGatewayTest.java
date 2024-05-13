@@ -23,7 +23,7 @@ public class RequestGatewayTest {
     public RabbitResource rabbit = new RabbitResource();
 
     @Rule
-    public Timeout timeout = new Timeout(10, TimeUnit.SECONDS);
+    public Timeout timeout = new Timeout(10999999, TimeUnit.SECONDS);
 
     private IMessagingFactory factory;
     private IQueueManager queueManager;

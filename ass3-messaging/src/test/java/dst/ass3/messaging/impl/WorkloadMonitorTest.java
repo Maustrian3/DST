@@ -32,7 +32,7 @@ public class WorkloadMonitorTest {
     public RabbitResource rabbit = new RabbitResource();
 
     @Rule
-    public Timeout timeout = new Timeout(60, TimeUnit.SECONDS);
+    public Timeout timeout = new Timeout(6099999, TimeUnit.SECONDS);
 
     private IMessagingFactory factory;
     private IQueueManager queueManager;

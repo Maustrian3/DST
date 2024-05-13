@@ -1,28 +1,36 @@
 package dst.ass3.messaging.impl;
 
-import dst.ass3.messaging.IMessagingFactory;
-import dst.ass3.messaging.IQueueManager;
-import dst.ass3.messaging.IRequestGateway;
-import dst.ass3.messaging.IWorkloadMonitor;
+import com.rabbitmq.http.client.Client;
+import com.rabbitmq.http.client.ClientParameters;
+import dst.ass3.messaging.*;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 public class MessagingFactory implements IMessagingFactory {
 
     @Override
     public IQueueManager createQueueManager() {
-        // TODO
-        return null;
+        return new QueueManager();
     }
 
     @Override
     public IRequestGateway createRequestGateway() {
-        // TODO
-        return null;
+        return new RequestGateway();
     }
 
     @Override
     public IWorkloadMonitor createWorkloadMonitor() {
-        // TODO
-        return null;
+        try {
+            Client client = new Client(
+                    new ClientParameters()
+                            .url(Constants.RMQ_API_URL)
+                            .username(Constants.RMQ_USER)
+                            .password(Constants.RMQ_PASSWORD));
+            return new WorkloadMonitor(client);
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
