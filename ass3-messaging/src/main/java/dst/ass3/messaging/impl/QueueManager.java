@@ -31,12 +31,12 @@ public class QueueManager implements IQueueManager {
         }
 
         try (Channel channel = connection.createChannel()) {
+            // Create exchanges
+            channel.exchangeDeclare(TOPIC_EXCHANGE, "direct", false);
             // Create work queues
             for (String queue : WORK_QUEUES) {
                 channel.queueDeclare(queue, false, false, false, null);
             }
-            // Create exchanges
-            channel.exchangeDeclare(TOPIC_EXCHANGE, "direct", false);
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }
@@ -45,12 +45,12 @@ public class QueueManager implements IQueueManager {
     @Override
     public void tearDown() {
         try (Channel channel = connection.createChannel()) {
+            // Delete all exchanges
+            channel.exchangeDelete(TOPIC_EXCHANGE);
             // Delete all queues
             for (String queue : WORK_QUEUES) {
                 channel.queueDelete(queue);
             }
-            // Delete all exchanges
-            channel.exchangeDelete(TOPIC_EXCHANGE);
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }

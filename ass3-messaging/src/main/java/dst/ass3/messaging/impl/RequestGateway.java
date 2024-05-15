@@ -68,6 +68,8 @@ public class RequestGateway implements IRequestGateway {
 
     @Override
     public void close() throws IOException {
-
+        if (connection != null) {
+            connection.close();
+        }
     }
 }
