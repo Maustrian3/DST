@@ -62,19 +62,7 @@ public class WorkloadMonitor implements IWorkloadMonitor {
                 channel.queueBind(monitoringQueue, TOPIC_EXCHANGE, routingKey);
             }
 
-            // TODO delete one implementation of the consumer
-            // Create consumer callback for monitoring queue
-//            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-//                String routingKey = delivery.getEnvelope().getRoutingKey();
-//                Region region = Region.valueOf(routingKey.substring(routingKey.indexOf(".") + 1).toUpperCase());
-//                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-//
-//                // Process message concurrently
-//                processMessage(region, message);
-//            };
-//            channel.basicConsume(monitoringQueue, true, deliverCallback, consumerTag -> { });
-
-//            // Create consumer for monitoring queue
+            // Create consumer for monitoring queue
             channel.basicConsume(monitoringQueue, true,
                     new DefaultConsumer(channel) {
                         @Override
