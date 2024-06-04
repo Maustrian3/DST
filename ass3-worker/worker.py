@@ -100,8 +100,8 @@ def main(region):
     ))
     channel = connection.channel()
 
-    channel.queue_declare(queue=f'dst.{region}')
-    channel.exchange_declare(exchange=f'dst.workers', exchange_type='topic')
+    channel.queue_declare(queue=f'dst.{region}', durable=True)
+    channel.exchange_declare(exchange=f'dst.workers', exchange_type='topic', durable=True)
 
     while True:
         process_trip_request(channel, redis_client, region)
